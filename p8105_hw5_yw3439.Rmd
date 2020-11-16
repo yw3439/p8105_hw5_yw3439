@@ -1,0 +1,41 @@
+---
+title: "p8105_hw5_yw3439"
+author: "Qetsiyah Wang"
+date: "11/15/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+
+library(tidyverse)
+library(dplyr)
+```
+
+# Problem 1 - Washington Homicides
+
+```{r}
+homicide = read_csv("homicide-data.csv")
+```
+  The raw dataset contains `r ncol(homicide)` variables and `r nrow(homicide)` observations. Major variables contain: information about victims in each homicide, including their names, `r str_remove(colnames(homicide)[5:7], pattern = "victim_")`, and reported case information, such as `r colnames(homicide)[8:12]` and `r colnames(homicide)[2]`. 
+
+```{r}
+
+homicide %>%
+  mutate(
+    city_state = paste(city, ",", state)
+  ) %>%
+  select(-city, -state)
+
+```
+
+
+
+
+
+
+
+
+
