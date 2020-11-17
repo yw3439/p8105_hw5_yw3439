@@ -101,10 +101,41 @@ file = list.files("./data/", recursive= TRUE, full.names = TRUE)
 
 study = purrr::map(file, ~ read.csv(.)) %>%
   reduce(rbind) %>%
-  
+  mutate(
+    subject_id = rep(c(1:10),2)
+  ) %>%
+  arrange(subject_id) %>%
+  mutate(
+    arm = rep(c("control", "experiment"), 10))
+
+study %>%
+  pivot_longer(
+    week_1 : week_8,
+    names_to = "week",
+    values_to = "observations",
+    names_prefix = "week_"
+  ) %>%
+  mutate(
+    week = as.numeric(week),
+    subject_id = as.factor(subject_id)
+  ) %>%
+  ggplot(aes(x = week, y = observations, color = subject_id)) +
+  geom_line() +
+  facet_grid(~arm) +
+  labs(
+    title = "Observations on each subject over time within Control and Experimental group",
+    x = "Week",
+    y = "Observations"
+  )
 
 ```
+  The control group, showing fluctuations within certain range during 8 weeks, represented the overall flat trend with tiny differences between starting and ending observations. For example, subject_5 in the control group showed the difference between the start and end of `n study$week8[5]-study$week1[5]`. Unlike the control group, the experimental group represented the overall significantly increasing trend in observations across the period of 8 weeks. Subject_5 in the experimental group showed the difference across the experiment period of `n study$week8[15]-study$week1[15]` Especially within the first 2 weeks, all subjects in the experimental group showed very steep slopes. Overall comparison indicated the exposure in this longitudinal study did have efficacy on subjects.
+  
+```{r}
 
+
+
+```
 
 
 
