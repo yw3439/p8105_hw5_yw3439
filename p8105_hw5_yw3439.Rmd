@@ -23,14 +23,32 @@ homicide = read_csv("homicide-data.csv")
 
 ```{r}
 
-homicide %>%
+cases = homicide %>%
   mutate(
     city_state = paste(city, ",", state)
   ) %>%
-  select(-city, -state)
+  select(-city, -state) %>%
+  group_by(city_state, disposition) %>%
+  summarize(n = n()) %>%
+  pivot_wider(
+    names_from = disposition,
+    values_from = n
+  ) %>%
+  janitor::clean_names() %>%
+  mutate(
+    total_cases = sum(closed_by_arrest, closed_without_arrest, open_no_arrest, na.rm = TRUE),
+    unsolved_cases = sum(closed_without_arrest, open_no_arrest, na.rm = TRUE)
+  ) %>%
+  select(-closed_by_arrest, -closed_without_arrest, -open_no_arrest)
 
 ```
+knitr::kable(cases)
 
+```{r}
+
+prop_test = 
+
+```
 
 
 
