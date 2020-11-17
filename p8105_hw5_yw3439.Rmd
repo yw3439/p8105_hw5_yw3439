@@ -46,12 +46,64 @@ knitr::kable(cases)
 
 ```{r}
 
-prop_test = 
+baltimore = cases %>%
+  filter(city_state == "Baltimore , MD") %>%
+  as.list()
+
+baltimore_prop = prop.test(x = baltimore[["unsolved_cases"]], n = baltimore[["total_cases"]]) %>%
+  broom::tidy() %>%
+  select(estimate, conf.low, conf.high)
+  
+```
+  With proportion test of homicide cases in Baltimore, MD, the estimate proportion is `r round(pull(baltimore_prop, estimate), 2)` and the confidence level for the test is (`r round(pull(baltimore_prop, conf.low, 2))`, `r round(pull(baltimore_prop, conf.high, 2))`).
+  
+```{r}
+
+propor = function(unsolved, total) {
+  
+  prop.test(x = unsolved, n = total) %>%
+    broom::tidy() %>%
+    select(estimate, conf.low, conf.high)
+}
+
+cases_test = cases[2:3]
+  
+  
+cases_test = cases_test %>%
+  mutate(
+    output = map2(.x = cases_test$unsolved_cases, .y = cases_test$total_cases, ~ propor(unsolved = .x, total = .y)),
+    result = map(output, bind_rows)
+  ) %>%
+  select(-output) %>%
+  unnest(result)
+
+cases_test = cases_test %>%
+  mutate(
+    city_state = pull(cases, city_state)
+  ) %>%
+  select(city_state, estimate, conf.low, conf.high)
+
+```
+knitr::kable(cases_test)
+
+  Proportion test for each cities about unsolved homicide cases are shown in the table above.
+
+```{r}
+
 
 ```
 
+# Probelm 2
 
+```{r}
 
+file = list.files("./data/", recursive= TRUE, full.names = TRUE) 
+
+study = purrr::map(file, ~ read.csv(.)) %>%
+  reduce(rbind) %>%
+  
+
+```
 
 
 
