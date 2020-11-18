@@ -41,8 +41,10 @@ cases = homicide %>%
   ) %>%
   select(-closed_by_arrest, -closed_without_arrest, -open_no_arrest)
 
+knitr::kables(cases, caption = "Homicides for Each City-State")
+
 ```
-knitr::kable(cases)
+
 
 ```{r}
 
@@ -54,6 +56,7 @@ baltimore_prop = prop.test(x = baltimore[["unsolved_cases"]], n = baltimore[["to
   broom::tidy() %>%
   select(estimate, conf.low, conf.high)
   
+knitr::kables(baltimore_prop, caption = "Unsolved Homicides for Baltimore")
 ```
   With proportion test of homicide cases in Baltimore, MD, the estimate proportion is `r round(pull(baltimore_prop, estimate), 2)` and the confidence level for the test is (`r round(pull(baltimore_prop, conf.low, 2))`, `r round(pull(baltimore_prop, conf.high, 2))`).
   
@@ -84,21 +87,30 @@ cases_test = cases_test %>%
   ) %>%
   select(city_state, estimate, conf.low, conf.high)
 
+knitr::kable(cases_test, caption = "Estimated Proportion of Unsolved Homicides for Each City-State")
+
 ```
-knitr::kable(cases_test)
+
 
   Proportion test for each cities about unsolved homicide cases are shown in the table above.
 
 ```{r}
 
 cases_test %>%
+  arrange(-estimate) %>% 
+  mutate(
+  city_state = fct_reorder(city_state, estimate))%>%
   ggplot(aes(x = city_state, y = estimate, ymin = conf.low, ymax = conf.high)) +
   geom_errorbar(width = 0.5) +
-  coord_flip()
+  coord_flip() +
+  labs(
+    title = "Estimated Proportion of Unsolved Homicides for Each City-State",
+    x = "Estimate Proportion of Unsolved Homicides",
+    y = "City and State"
+  )
 
 ```
 
-  
 
 # Probelm 2
 
@@ -114,6 +126,8 @@ study = purrr::map(file, ~ read.csv(.)) %>%
   arrange(subject_id) %>%
   mutate(
     arm = rep(c("control", "experiment"), 10))
+
+knitr::kable(study)
 
 study %>%
   pivot_longer(
@@ -183,7 +197,7 @@ mu_test %>%
   
 ```
 
-  Based on the plot shown above, the association between effect size of mu and the power of the test is positive correlated. When the effect size of mu increases, more amount of the null would be rejected and the power of the test increases. Because with the effect size of mean increases, the magnitude of difference between true mean and the null increases the probability of rejecting the null while the alternative hypothesis is right. With the sensitivity increases, the power of the test increases. Same conclusion can be addressed from the plot, as the effect size of mu approaches to 6, the power of the test is approximately equal to 1.
+  Based on the plot shown above, the association between effect size of mu and the power of the test is positive correlated. When the effect size of mu increases, more amount of the null would be rejected and the power of the test increases. Because with the effect size of mean increases, the magnitude of difference between true mean and the null increases the probability of rejecting the null while the alternative hypothesis is right. With the sensitivity increases, the power of the test increases. Same conclusion can be addressed from the plot, as the effect size of mu approaches to 6, the power of the test is equal to 1.
 
 ```{r}
 
@@ -214,14 +228,7 @@ ggplot(all_mu, aes(x = mu, y = mean_estimate)) +
 
 ```
    
-   Shown in the plot above, average of all values of mu will be equal to true value of mu, following the expectation rule for probability. As the effect size of mu increases, the magnitude of difference between the null and true mean increases, so that the proportion of rejected null decreases. In other words, more values of estimated mu get approached to the true mu. Same value 
-  
-
-
-
-
-
-
+   Shown in the plot above, average of all values of mu will be equal to true value of mu, following the expectation rule for probability. As the effect size of mu increases, the magnitude of difference between the null and true mean increases, so that the proportion of rejected null decreases. In other words, more values of estimated mu get approached to the true mu. Same observations can be concluded from the plot that the average of estimated mu within rejected null approximates to all mu, which fits with the plot result from the figure of "Association between Power and Effect Size".
 
 
 
